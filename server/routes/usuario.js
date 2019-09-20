@@ -9,12 +9,15 @@ const _=require('underscore');
 // Importamos el modelo
 const Usuario = require('../models/usuario')
 
+//
+const {verificaToken, verificaAdmin_Role} = require('../middlewares/autenticacion')
+
 const app = express();
 
 
 
-app.get('/usuario', function (req, res) {
-  
+app.get('/usuario', verificaToken, (req, res) => {
+
   // mandarlo por query /usuario?desde=10&limite=5
   let desde = req.query.desde || 0
   desde = Number(desde)
@@ -51,7 +54,7 @@ app.get('/usuario', function (req, res) {
 
 
 
-app.post('/usuario', function (req, res) {
+app.post('/usuario', [verificaToken,verificaAdmin_Role], function (req, res) {
 
 let body = req.body
 
@@ -95,7 +98,7 @@ if (body.nombre === undefined) {
 
 
 
-app.put('/usuario/:id', function (req, res) {
+app.put('/usuario/:id', [verificaToken,verificaAdmin_Role], function (req, res) {
   
   //recoger id de los params
   let id = req.params.id
@@ -109,7 +112,7 @@ app.put('/usuario/:id', function (req, res) {
           return res.status(400).json({
             ok: false,
             err
-      })
+      });
       }
     
       res.json({
@@ -123,7 +126,7 @@ app.put('/usuario/:id', function (req, res) {
 });
 
 
-app.delete('/usuario/:id', function (req, res) {
+app.delete('/usuario/:id',[verificaToken,verificaAdmin_Role], function (req, res) {
   
     let id = req.params.id;
     

@@ -16,8 +16,9 @@ app.use(bodyParser.urlencoded({ extended: false }))
 
 
 
-// Importamos y usamos las rutas del usuario
-app.use( require('./routes/usuario'))
+// Configuracion global de rutas
+app.use(require('./routes/index'));
+
 
 
 
