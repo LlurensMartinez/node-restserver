@@ -12,11 +12,9 @@ const Usuario = require('../models/usuario')
 //
 const {verificaToken, verificaAdmin_Role} = require('../middlewares/autenticacion')
 
-const app = express();
+const router = express.Router();
 
-
-
-app.get('/usuario', verificaToken, (req, res) => {
+router.get('/usuario', verificaToken, (req, res) => {
 
   // mandarlo por query /usuario?desde=10&limite=5
   let desde = req.query.desde || 0
@@ -25,7 +23,7 @@ app.get('/usuario', verificaToken, (req, res) => {
   let limite = req.query.limite || 5
   limite = Number(limite)
 
-  Usuario.find({estado: true}, 'nombre email role estado google img')
+  Usuario.find({estado: true}, 'nombre apellidos email role estado google img')
           .skip(desde) //saltarse los primeros 5
           .limit(limite) //mostrar los siguientes 5
           .exec((err, usuarios) => {
@@ -52,19 +50,17 @@ app.get('/usuario', verificaToken, (req, res) => {
 
 
 
-
-
-app.post('/usuario', [verificaToken,verificaAdmin_Role], function (req, res) {
+router.post('/usuario', function (req, res) {
 
 let body = req.body
 
 //Crear un nuevo usuario
 let usuario = new Usuario({
-  nombre: body.nombre,
+  nombre: body.firstname,
+  apellidos: body.surnames,
   email: body.email,
   password: bcrypt.hashSync(body.password, 10), //segundo arg numeros de veces de encriptado
   confirmPassword: bcrypt.hashSync(body.confirmPassword, 10),
-  role: body.role
 });
 
 
@@ -77,17 +73,14 @@ usuario.save((err, usuarioDB) => {
         err
       })
   }
-
-
   res.json({
     ok:true,
     usuario: usuarioDB
   })
 });
 
-
-if (body.nombre === undefined) {
-  res.status(400).json({
+if (body.firstname === undefined) {
+  return res.status(400).json({
     ok: false,
     message: "El nombre es necesario"
   });
@@ -98,11 +91,11 @@ if (body.nombre === undefined) {
 
 
 
-app.put('/usuario/:id', [verificaToken,verificaAdmin_Role], function (req, res) {
+router.put('/usuario/:id', [verificaToken,verificaAdmin_Role], function (req, res) {
   
   //recoger id de los params
   let id = req.params.id
-  let body = _.pick(req.body, ['nombre', 'email', 'img','role', 'estado']);
+  let body = _.pick(req.body, ['nombre', 'apellidos', 'email', 'img','role', 'estado']);
 
   // primer parametro id segundo objeto a actualizar
   // luego las opciones: new para actualizar objeto y run Validators para aplicar las validaciones del modelo
@@ -126,7 +119,7 @@ app.put('/usuario/:id', [verificaToken,verificaAdmin_Role], function (req, res) 
 });
 
 
-app.delete('/usuario/:id',[verificaToken,verificaAdmin_Role], function (req, res) {
+router.delete('/usuario/:id',[verificaToken,verificaAdmin_Role], function (req, res) {
   
     let id = req.params.id;
     
@@ -166,4 +159,4 @@ app.delete('/usuario/:id',[verificaToken,verificaAdmin_Role], function (req, res
 });
 
 
-module.exports = app;
+module.exports = router;

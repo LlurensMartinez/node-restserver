@@ -7,11 +7,18 @@ const path = require('path');
 
 const app = express();
 
+const cors = require('cors');
+
 const bodyParser = require('body-parser')
 
 // create application/json parser
 app.use(bodyParser.json())
 
+//Habilitar cors
+app.use(cors({
+  credentials: true,
+  origin: ['http://localhost:8080']
+}));
 
 // create application/x-www-form-urlencoded parser
 app.use(bodyParser.urlencoded({ extended: false }))
