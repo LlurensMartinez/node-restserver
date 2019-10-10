@@ -79,18 +79,20 @@ app.get('/comentario/:id', verificaToken,(req, res) => {
 // Crear nuevo comentario
 //=================================
 
-app.post('/comentario', (req, res) => {
+app.post('/comentario/:token', verificaToken, (req, res) => {
 
   let body = req.body
+
   //Crear un nuevo comentario
   let comentario = new Comentarios({
     comment: body.comment,
     title: body.title,
-    // user: req.usuario._id
+    user: req.usuario._id
   });
-  
+
   // Grabar en la base de datos
   comentario.save((err, comentarioDB) => {
+
     if(err){
         return res.status(500).json({
           ok: false,
