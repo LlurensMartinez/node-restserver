@@ -13,12 +13,11 @@ const client = new OAuth2Client(process.env.CLIENT_ID);
 // Importamos el modelo
 const Usuario = require('../models/usuario')
 
-const app = express();
+const router = express.Router();
 
-app.post('/login', (req, res) => {
+router.post('/login', (req, res) => {
 
     let body = req.body;
-
     // buscas es email en la base de datos y sacas el usuarioDB completo
     Usuario.findOne({ email: body.email}, (err, usuarioDB)=>{
 
@@ -40,7 +39,6 @@ app.post('/login', (req, res) => {
 
       // Comprar contraseña con comntraseña base de datos
       if (!bcrypt.compareSync(body.password, usuarioDB.password)){
-
         return res.status(400).json({
           ok: false,
           err: {
@@ -89,10 +87,10 @@ async function verify(token) {
 
 
 
-app.post('/google', async (req, res) => {
+router.post('/google', async (req, res) => {
 
     // Recibimos el token
-    let token = req.body.idtoken
+    let token = req.body.id_token
 
     let googleUser = await verify(token)
         .catch(e=>{
@@ -101,7 +99,7 @@ app.post('/google', async (req, res) => {
             err: e
           });
         });
-    
+    console.log(googleUser.body)
     // vereificamons si en mi base de datos existe el correo
     Usuario.findOne ({email: googleUser.email}, (err, usuarioDB)=>{
 
@@ -176,4 +174,4 @@ app.post('/google', async (req, res) => {
 
 
 
-module.exports = app;
+module.exports = router;

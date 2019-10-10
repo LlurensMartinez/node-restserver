@@ -4,18 +4,18 @@ const {verificaToken, verificaAdmin_Role} = require('../middlewares/autenticacio
 
 const app = express();
 
-const Categoria = require('../models/categoria')
+const Comentarios = require('../models/comentarios')
 
 
 //=================================
 // Mostrar todas las categorias
 //=================================
-app.get('/categoria', verificaToken, (req, res) => {
+app.get('/comentario', verificaToken, (req, res) => {
 
-  Categoria.find({})
+  comentarios.find({})
             .sort('descripcion')
-            .populate('usuario', 'nombre email') //Muestra el object id del usuario (solo nombre y email)
-            .exec((err, categorias) => {
+            .populate('usuario', 'nombre img') //Muestra el object id del usuario (solo nombre y email)
+            .exec((err, comentarios) => {
               if(err){
                 return res.status(400).json({
                   ok: false,
@@ -23,7 +23,7 @@ app.get('/categoria', verificaToken, (req, res) => {
                 });   
              }
 
-             Categoria.count((err, conteo) => {
+             Comentarios.count((err, conteo) => {
 
               if(err){
                 return res.status(400).json({
@@ -34,7 +34,7 @@ app.get('/categoria', verificaToken, (req, res) => {
 
               res.json({
               ok:true,
-              catogrias: categorias,
+              comentarios: comentarios,
               cuantos: conteo
               });
 
@@ -45,11 +45,11 @@ app.get('/categoria', verificaToken, (req, res) => {
 //=================================
 // Mostrar una categoria
 //=================================
-app.get('/categoria/:id', verificaToken,(req, res) => {
+app.get('/comentario/:id', verificaToken,(req, res) => {
   //recoger id de los params
   let id = req.params.id
   
-  Categoria.findById(id,(err, categoriaDB) => {
+  Comentarios.findById(id,(err, comentarioDB) => {
 
         if(err){
             return res.status(500).json({
@@ -58,7 +58,7 @@ app.get('/categoria/:id', verificaToken,(req, res) => {
         });
         }
 
-        if(!categoriaDB){
+        if(!comentarioDB){
           return res.status(400).json({
             ok: false,
             err: {
@@ -69,29 +69,28 @@ app.get('/categoria/:id', verificaToken,(req, res) => {
       
         res.json({
           ok: true,
-          categoria: categoriaDB
+          comentario: comentarioDB
         });
           
     })
 });
 
 //=================================
-// Crear nueva categoria
+// Crear nuevo comentario
 //=================================
 
-app.post('/categoria', verificaToken, (req, res) => {
+app.post('/comentario', (req, res) => {
 
   let body = req.body
-
-  //Crear una nueva categoria
-  let categoria = new Categoria({
-    descripcion: body.descripcion,
-    usuario: req.usuario._id
+  //Crear un nuevo comentario
+  let comentario = new Comentarios({
+    comment: body.comment,
+    title: body.title,
+    // user: req.usuario._id
   });
-
+  
   // Grabar en la base de datos
-  categoria.save((err, categoriaDB) => {
-
+  comentario.save((err, comentarioDB) => {
     if(err){
         return res.status(500).json({
           ok: false,
@@ -99,7 +98,7 @@ app.post('/categoria', verificaToken, (req, res) => {
         });
     }
 
-    if(!categoriaDB){
+    if(!comentarioDB){
         return res.status(400).json({
           ok: false,
           err
@@ -108,14 +107,14 @@ app.post('/categoria', verificaToken, (req, res) => {
 
     res.json({
       ok:true,
-      categoria: categoriaDB
+      comentario: comentarioDB
     })
   });
 
-  if (body.descripcion === undefined) {
+  if (body.comment === undefined) {
     res.status(400).json({
       ok: false,
-      message: "La descripcion es necesaria"
+      message: "El comentario es necesario"
     });
   }
 });
@@ -125,16 +124,16 @@ app.post('/categoria', verificaToken, (req, res) => {
 // Actualizar descpricion de la categoria
 //=================================
 
-app.put('/categoria/:id', verificaToken, (req, res) => {
+app.put('/comentario/:id', verificaToken, (req, res) => {
   //recoger id de los params
   let id = req.params.id
   let body = req.body
 
-  let descCategoria = {
-    descripcion: body.descripcion
+  let descComentario = {
+    comment: body.comment
   }
 
-  Categoria.findByIdAndUpdate(id, descCategoria, {new: true, runValidators: true}, (err, categoriaDB) => {
+  Comentarios.findByIdAndUpdate(id, descComentario, {new: true, runValidators: true}, (err, comentarioDB) => {
 
     if(err){
         return res.status(500).json({
@@ -143,7 +142,7 @@ app.put('/categoria/:id', verificaToken, (req, res) => {
     });
     }
 
-    if(!categoriaDB){
+    if(!comentarioDB){
       return res.status(400).json({
         ok: false,
         err
@@ -152,7 +151,7 @@ app.put('/categoria/:id', verificaToken, (req, res) => {
   
     res.json({
       ok: true,
-      categoria: categoriaDB
+      comentario: comentarioDB
     });
       
   });
@@ -161,12 +160,12 @@ app.put('/categoria/:id', verificaToken, (req, res) => {
 //=================================
 // Eliminar una cateogria
 //=================================
-app.delete('/categoria/:id', [verificaToken,verificaAdmin_Role], (req, res) => {
+app.delete('/comentario/:id', [verificaToken,verificaAdmin_Role], (req, res) => {
   //solo un administrador puede borrar categorias
   let id = req.params.id;
 
   //Castegoria.findByidANdRemove
-  Categoria.findByIdAndRemove(id,(err, categoriaDB) => {
+  Comentarios.findByIdAndRemove(id,(err, comentarioDB) => {
 
     if(err){
         return res.status(400).json({
@@ -175,7 +174,7 @@ app.delete('/categoria/:id', [verificaToken,verificaAdmin_Role], (req, res) => {
     });
     }
 
-    if(!categoriaDB){
+    if(!comentarioDB){
       return res.status(400).json({
         ok: false,
         err: {
@@ -186,8 +185,8 @@ app.delete('/categoria/:id', [verificaToken,verificaAdmin_Role], (req, res) => {
   
     res.json({
       ok: true,
-      categoria: categoriaDB,
-      message: 'Categoria borrada'
+      comentario: comentarioDB,
+      message: 'Comentario borrado'
     });
       
   })
