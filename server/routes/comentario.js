@@ -2,7 +2,7 @@ const express = require('express');
 
 const {verificaToken, verificaAdmin_Role} = require('../middlewares/autenticacion');
 
-const app = express();
+const router = express.Router();
 
 const Comentarios = require('../models/comentarios')
 
@@ -10,12 +10,11 @@ const Comentarios = require('../models/comentarios')
 //=================================
 // Mostrar todas las categorias
 //=================================
-app.get('/comentario', verificaToken, (req, res) => {
+router.get('/comentario', (req, res) => {
 
-  comentarios.find({})
-            .sort('descripcion')
-            .populate('usuario', 'nombre img') //Muestra el object id del usuario (solo nombre y email)
-            .exec((err, comentarios) => {
+  Comentarios.find({})
+            .populate('user', 'nombre apellidos img') //Muestra el object id del usuario (solo nombre y email)
+            .exec((err, comments) => {
               if(err){
                 return res.status(400).json({
                   ok: false,
@@ -23,7 +22,7 @@ app.get('/comentario', verificaToken, (req, res) => {
                 });   
              }
 
-             Comentarios.count((err, conteo) => {
+             Comentarios.count((err, count) => {
 
               if(err){
                 return res.status(400).json({
@@ -34,8 +33,8 @@ app.get('/comentario', verificaToken, (req, res) => {
 
               res.json({
               ok:true,
-              comentarios: comentarios,
-              cuantos: conteo
+              comments: comments,
+              count: count
               });
 
           });
@@ -45,7 +44,7 @@ app.get('/comentario', verificaToken, (req, res) => {
 //=================================
 // Mostrar una categoria
 //=================================
-app.get('/comentario/:id', verificaToken,(req, res) => {
+router.get('/comentario/:id', verificaToken,(req, res) => {
   //recoger id de los params
   let id = req.params.id
   
@@ -79,7 +78,7 @@ app.get('/comentario/:id', verificaToken,(req, res) => {
 // Crear nuevo comentario
 //=================================
 
-app.post('/comentario/:token', verificaToken, (req, res) => {
+router.post('/comentario/:token', verificaToken, (req, res) => {
 
   let body = req.body
 
@@ -126,7 +125,7 @@ app.post('/comentario/:token', verificaToken, (req, res) => {
 // Actualizar descpricion de la categoria
 //=================================
 
-app.put('/comentario/:id', verificaToken, (req, res) => {
+router.put('/comentario/:id', verificaToken, (req, res) => {
   //recoger id de los params
   let id = req.params.id
   let body = req.body
@@ -162,7 +161,7 @@ app.put('/comentario/:id', verificaToken, (req, res) => {
 //=================================
 // Eliminar una cateogria
 //=================================
-app.delete('/comentario/:id', [verificaToken,verificaAdmin_Role], (req, res) => {
+router.delete('/comentario/:id', [verificaToken,verificaAdmin_Role], (req, res) => {
   //solo un administrador puede borrar categorias
   let id = req.params.id;
 
@@ -195,4 +194,4 @@ app.delete('/comentario/:id', [verificaToken,verificaAdmin_Role], (req, res) => 
 });
 
 
-module.exports = app;
+module.exports = router;
