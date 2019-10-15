@@ -1,7 +1,10 @@
 const express = require('express');
 
+const {verificaToken} = require('../middlewares/autenticacion')
+
 // npm install --save express-fileupload
 const fileUpload = require('express-fileupload');
+const router = express.Router();
 const app = express();
 
 const Usuario = require('../models/usuario');
@@ -11,13 +14,13 @@ const fs = require('fs');
 const path = require('path');
 
 // default options
-app.use(fileUpload());
+router.use(fileUpload());
 
-app.put('/upload/:tipo/:id', function(req, res) {
+router.put('/upload/:tipo/:id',  function(req, res) {
 
   let tipo = req.params.tipo;
   let id = req.params.id;
-
+ 
   if (!req.files) {
     return res.status(400).json({
         ok: false,
@@ -39,7 +42,7 @@ app.put('/upload/:tipo/:id', function(req, res) {
   }
 
   // The name of the input field (i.e. "archivo") is used to retrieve the uploaded file
-  let archivo = req.files.archivo;
+  let archivo = req.files.file;
   let nombreCortado = archivo.name.split('.')
   let extension = nombreCortado[nombreCortado.length -1];
   
@@ -89,6 +92,7 @@ imagenUsuario = (id, res, nombreArchivo) => {
   
   // Buscar por id la imagen vieja para despues actualizar por la nueva
   Usuario.findById(id, (err, usuarioDB) => {
+
     if (err){
       borraArchivo(usuarioDB.img, 'usuarios');
 
@@ -114,7 +118,6 @@ imagenUsuario = (id, res, nombreArchivo) => {
   });
 
   Usuario.findByIdAndUpdate(id, cambiaNombre, {new: true}, (err, usuarioGuardado)=> {
-
     if(err){
       return res.status(500).json({
         ok: false,
@@ -201,11 +204,11 @@ imagenProducto = (id, res, nombreArchivo) => {
 }
 
 borraArchivo = (nombreImagen, tipo) => {
-  let pathImagen = path.resolve(__dirname, `../../uploads/${tipo}/${nombreImagen}`);
+  let pathImagen = path.resolve(__dirname,`../../uploads/${tipo}/${nombreImagen}`);
     
   if(fs.existsSync(pathImagen)){
     fs.unlinkSync(pathImagen);  
   }
 }
 
-module.exports = app;
+module.exports = router;

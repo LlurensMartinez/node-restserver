@@ -91,23 +91,29 @@ if (body.firstname === undefined) {
 
 
 
-router.put('/usuario/:id', [verificaToken,verificaAdmin_Role], function (req, res) {
+router.put('/usuario/:id/:token', verificaToken, function (req, res) {
   
   //recoger id de los params
   let id = req.params.id
-  let body = _.pick(req.body, ['nombre', 'apellidos', 'email', 'img','role', 'estado']);
+  let body = _.pick(req.body, ['firstname', 'surnames', 'email', 'img','role', 'estado']);
+
+  //Actualizar uusuario
+  let user = {
+    nombre: body.firstname,
+    apellidos: body.surnames,
+    img: body.img
+  };
 
   // primer parametro id segundo objeto a actualizar
   // luego las opciones: new para actualizar objeto y run Validators para aplicar las validaciones del modelo
-  Usuario.findByIdAndUpdate(id, body, {new: true, runValidators: true}, (err, usuarioDB) => {
-
+  Usuario.findByIdAndUpdate(id, user, {new: true, runValidators: true}, (err, usuarioDB) => {
       if(err){
           return res.status(400).json({
             ok: false,
             err
       });
       }
-    
+
       res.json({
         ok: true,
         usuario: usuarioDB
