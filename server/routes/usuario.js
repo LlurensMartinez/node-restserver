@@ -103,7 +103,6 @@ router.put('/usuario/:id/:token', verificaToken, function (req, res) {
     apellidos: body.surnames,
     img: body.img
   };
-
   // primer parametro id segundo objeto a actualizar
   // luego las opciones: new para actualizar objeto y run Validators para aplicar las validaciones del modelo
   Usuario.findByIdAndUpdate(id, user, {new: true, runValidators: true}, (err, usuarioDB) => {

@@ -35,7 +35,7 @@ let usuarioSchema = new Schema({
   },
   img: {
     type: String,
-    default:'https://i.pinimg.com/originals/47/1a/1a/471a1ad342659289433e05a611d206f8.png',
+    default: "no-image.jpg",
     required: false
   },
   role: {
