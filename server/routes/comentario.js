@@ -13,7 +13,7 @@ const Comentarios = require('../models/comentarios')
 router.get('/comentario', (req, res) => {
 
   Comentarios.find({})
-            .populate('user', 'nombre apellidos img') //Muestra el object id del usuario (solo nombre y email)
+            .populate('user', '_id nombre apellidos img') //Muestra el object id del usuario (solo nombre y email)
             .exec((err, comments) => {
               if(err){
                 return res.status(400).json({
@@ -21,7 +21,6 @@ router.get('/comentario', (req, res) => {
                   err
                 });   
              }
-
              Comentarios.count((err, count) => {
 
               if(err){
@@ -30,7 +29,7 @@ router.get('/comentario', (req, res) => {
                   err
                 });   
              }
-
+             
               res.json({
               ok:true,
               comments: comments,
@@ -42,9 +41,10 @@ router.get('/comentario', (req, res) => {
 })
 
 //=================================
-// Mostrar una categoria
+// Mostrar comentarios
 //=================================
 router.get('/comentario/:id', verificaToken,(req, res) => {
+  
   //recoger id de los params
   let id = req.params.id
   
