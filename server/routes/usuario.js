@@ -95,14 +95,39 @@ router.put('/usuario/:id/:token', verificaToken, function (req, res) {
   
   //recoger id de los params
   let id = req.params.id
-  let body = _.pick(req.body, ['firstname', 'surnames', 'email', 'img','role', 'estado']);
+  let body = _.pick(req.body, ['firstname', 'surnames', 'email', 'img','role', 'estado', 'password' ]);
+  let user;
 
-  //Actualizar uusuario
-  let user = {
-    nombre: body.firstname,
-    apellidos: body.surnames,
-    img: body.img
-  };
+  userChange = (password, image) => {
+
+      if(password === "" && image === ""){
+        return user = {
+          nombre: body.firstname,
+          apellidos: body.surnames,
+        };
+      } else if(password != "" && image === ""){ 
+        return user = {
+          nombre: body.firstname,
+          apellidos: body.surnames,
+          password: bcrypt.hashSync(body.password, 10)
+        };
+      }else if(password === "" && image != ""){
+        return user = {
+          nombre: body.firstname,
+          apellidos: body.surnames,
+          img: body.img,
+        };
+      }else{
+        return user = {
+          nombre: body.firstname,
+          apellidos: body.surnames,
+          img: body.img,
+          password: bcrypt.hashSync(body.password, 10)
+        };
+      }
+  }
+  
+  userChange(body.password, body.img);
   // primer parametro id segundo objeto a actualizar
   // luego las opciones: new para actualizar objeto y run Validators para aplicar las validaciones del modelo
   Usuario.findByIdAndUpdate(id, user, {new: true, runValidators: true}, (err, usuarioDB) => {
@@ -120,7 +145,6 @@ router.put('/usuario/:id/:token', verificaToken, function (req, res) {
         
   })
 
-  
 });
 
 
