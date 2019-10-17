@@ -47,7 +47,7 @@ router.get('/comentario/:id', verificaToken,(req, res) => {
   
   //recoger id de los params
   let id = req.params.id
-  
+
   Comentarios.findById(id,(err, comentarioDB) => {
 
         if(err){
@@ -122,15 +122,16 @@ router.post('/comentario/:token', verificaToken, (req, res) => {
 
 
 //=================================
-// Actualizar descpricion de la categoria
+// Actualizar descpricion y titulo del comentario
 //=================================
 
-router.put('/comentario/:id', verificaToken, (req, res) => {
+router.put('/comentario/:id/:token', verificaToken, (req, res) => {
   //recoger id de los params
   let id = req.params.id
   let body = req.body
 
   let descComentario = {
+    title: body.title,
     comment: body.comment
   }
 
