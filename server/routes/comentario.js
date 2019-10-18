@@ -160,9 +160,9 @@ router.put('/comentario/:id/:token', verificaToken, (req, res) => {
 });
 
 //=================================
-// Eliminar una cateogria
+// Eliminar un comentario
 //=================================
-router.delete('/comentario/:id', [verificaToken,verificaAdmin_Role], (req, res) => {
+router.delete('/comentario/:id/:token', verificaToken, (req, res) => {
   //solo un administrador puede borrar categorias
   let id = req.params.id;
 
@@ -187,7 +187,7 @@ router.delete('/comentario/:id', [verificaToken,verificaAdmin_Role], (req, res) 
   
     res.json({
       ok: true,
-      comentario: comentarioDB,
+      comments: comentarioDB,
       message: 'Comentario borrado'
     });
       
