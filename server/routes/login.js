@@ -75,7 +75,7 @@ async function verify(token) {
       //[CLIENT_ID_1, CLIENT_ID_2, CLIENT_ID_3]
   });
   const payload = ticket.getPayload();
-  
+
   // retornamos los valores del usuario
   return {
     nombre: payload.name,
@@ -90,8 +90,8 @@ async function verify(token) {
 router.post('/google', async (req, res) => {
 
     // Recibimos el token
-    let token = req.body.id_token
-
+    let token = req.body.idtoken
+    
     let googleUser = await verify(token)
         .catch(e=>{
           return res.status(403).json({
@@ -99,11 +99,12 @@ router.post('/google', async (req, res) => {
             err: e
           });
         });
-    console.log(googleUser.body)
-    // vereificamons si en mi base de datos existe el correo
-    Usuario.findOne ({email: googleUser.email}, (err, usuarioDB)=>{
 
+    // verificamons si en mi base de datos existe el correo
+    Usuario.findOne ({email: googleUser.email}, (err, usuarioDB)=>{
+      
       if(err){
+        console.log('error 1')
         return res.status(500).json({
           ok: false,
           err
@@ -121,33 +122,33 @@ router.post('/google', async (req, res) => {
           }
         });
       
-      }else{
-        // Si el google del usuario es true reneovamos el token
-        let token = jwt.sign({
-          usuario: usuarioDB
-        },process.env.SEED, {expiresIn: process.env.CADUCIDAD_TOKEN}); // Cadicidad 30 dias
-
-        return res.json({
-          ok:true,
-          usuario: usuarioDB,
-          token,
-        });
-      }
+        }else{
+              // Si el google del usuario es true reneovamos el token
+              let token = jwt.sign({
+                usuario: usuarioDB
+              },process.env.SEED, {expiresIn: process.env.CADUCIDAD_TOKEN}); // Cadicidad 30 dias
+              return res.json({
+                ok:true,
+                usuario: usuarioDB,
+                token,
+              });
+            }
       } else {
         //Si el usuario no existe en nuestra base de datos creamos un nuevo usuario
-        let usuario = new Usuario()
-
-        usuario.nombre = googleUser.nombre;
-        usuario.email = googleUser.email;
-        usuario.img = googleUser.img;
-        usuario.google = true;
-        usuario.password = ':)'
-        usuario.confirmPassword = ':)'
-
+        let usuario = new Usuario({
+          nombre: googleUser.nombre,
+          email: googleUser.email,
+          img: googleUser.img,
+          google: true,
+          password: ':)',
+          confirmPassword: ':)'
+        })
+        console.log(usuario)
         // Guardamos el usuario en la base de datos
         usuario.save((err, usuarioDB) => {
-
+          console.log(usuarioDB)
           if(err){
+            console.log('error 2')
             return res.status(500).json({
               ok: false,
               err
