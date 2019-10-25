@@ -143,10 +143,9 @@ router.post('/google', async (req, res) => {
           password: ':)',
           confirmPassword: ':)'
         })
-        console.log(usuario)
+        
         // Guardamos el usuario en la base de datos
         usuario.save((err, usuarioDB) => {
-          console.log(usuarioDB)
           if(err){
             console.log('error 2')
             return res.status(500).json({
